@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from api.services.user_service import UserService
 
-user_bp = Blueprint("user", __name__)
+user_bp = Blueprint("user", __name__, url_prefix="/api")
 
 
 @user_bp.route("/users", methods=["POST"])
@@ -56,8 +56,8 @@ def get_user(user_id):
         return jsonify({"error": f"获取用户详情失败: {str(e)}"}), 500
 
 
-@user_bp.route("/users/by-auth-id/<auth_id>", methods=["GET"])
-def get_user_by_auth_id(auth_id):
+@user_bp.route("/users/by-auth-id", methods=["GET"])
+def get_user_by_auth_id():
     """
     根据Auth0标识获取用户API
 
@@ -65,12 +65,50 @@ def get_user_by_auth_id(auth_id):
     - auth_id: Auth0用户标识
     """
     try:
+        auth_id = request.args.get("auth_id")
         user = UserService.get_user_by_auth_id(auth_id)
         if not user:
             return jsonify({"error": "用户不存在"}), 404
         return jsonify({"data": user.to_dict()}), 200
     except Exception as e:
         return jsonify({"error": f"获取用户详情失败: {str(e)}"}), 500
+
+
+@user_bp.route("/users/by-auth-id", methods=["PUT"])
+def update_user():
+    """
+    更新用户资料API
+    路径参数:
+    - auth_id: Auth0用户标识
+    请求体:
+    {
+        "email": "用户邮箱",
+        "full_name": "用户全名",
+        "gender": "性别",
+        "mbti": "MBTI性格类型",
+        "star_sign": "星座",
+        "skills": "技能",
+        "interests": "兴趣",
+        "year_of_study": "学习年限",
+        "major": "专业",
+        "key_factors": {}, # JSON格式
+        "lightning_answers": {}, # JSON格式
+        "fun_facts": {}, # JSON格式
+        "best_working_experience": "",
+        "tags": {}, # JSON格式
+        "picture": "用户头像URL"
+    }
+    """
+    data = request.get_json()
+
+    try:
+        auth_id = request.args.get("auth_id")
+        user = UserService.update_user(auth_id, data)
+        return jsonify({"message": "用户资料更新成功", "data": user.to_dict()}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        return jsonify({"error": f"更新用户资料失败: {str(e)}"}), 500
 
 
 @user_bp.route("/users", methods=["GET"])

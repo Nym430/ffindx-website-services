@@ -1,4 +1,4 @@
-from api import db
+from app import db
 from datetime import datetime
 import json
 
@@ -22,6 +22,9 @@ class User(db.Model):
     lightning_answers = db.Column(
         db.Text, nullable=True, comment="快速回答，存储为JSON"
     )
+    fun_facts = db.Column(db.Text, nullable=True, comment="趣事，存储为JSON")
+    best_working_experience = db.Column(db.Text, nullable=True, comment="最佳工作经历")
+    tags = db.Column(db.Text, nullable=True, comment="标签，存储为JSON")
     picture = db.Column(db.String(500), nullable=True, comment="用户头像URL")
     user_id = db.Column(
         db.String(100), nullable=False, unique=True, comment="Auth0用户标识"
@@ -64,6 +67,38 @@ class User(db.Model):
                 return {}
         return {}
 
+    def set_fun_facts(self, fun_facts):
+        """设置趣事，接受字典或字符串"""
+        if isinstance(fun_facts, dict) or isinstance(fun_facts, list):
+            self.fun_facts = json.dumps(fun_facts)
+        else:
+            self.fun_facts = fun_facts
+
+    def get_fun_facts(self):
+        """获取趣事"""
+        if self.fun_facts:
+            try:
+                return json.loads(self.fun_facts)
+            except:
+                return self.fun_facts
+        return {}
+
+    def set_tags(self, tags):
+        """设置标签，接受字典或字符串"""
+        if isinstance(tags, dict) or isinstance(tags, list):
+            self.tags = json.dumps(tags)
+        else:
+            self.tags = tags
+
+    def get_tags(self):
+        """获取标签"""
+        if self.tags:
+            try:
+                return json.loads(self.tags)
+            except:
+                return self.tags
+        return {}
+
     def to_dict(self):
         """转换为字典"""
         return {
@@ -79,6 +114,9 @@ class User(db.Model):
             "major": self.major,
             "key_factors": self.get_key_factors(),
             "lightning_answers": self.get_lightning_answers(),
+            "fun_facts": self.get_fun_facts(),
+            "best_working_experience": self.best_working_experience,
+            "tags": self.get_tags(),
             "picture": self.picture,
             "user_id": self.user_id,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),

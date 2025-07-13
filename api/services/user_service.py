@@ -1,4 +1,4 @@
-from api import db
+from app import db
 from api.models.project import ProjectApplication, Project, SkillType
 from api.models.user import User
 from sqlalchemy import or_
@@ -40,6 +40,14 @@ class UserService:
         if "lightning_answers" in data:
             user.set_lightning_answers(data["lightning_answers"])
 
+        # 处理趣事
+        if "fun_facts" in data:
+            user.set_fun_facts(data["fun_facts"])
+
+        # 处理标签
+        if "tags" in data:
+            user.set_tags(data["tags"])
+
         # 保存到数据库
         db.session.add(user)
         db.session.commit()
@@ -54,6 +62,53 @@ class UserService:
         :return: 用户对象
         """
         return User.query.get_or_404(user_id)
+
+    @staticmethod
+    def update_user(user_id, data):
+        """
+        更新用户信息
+        :param user_id: 要更新的用户ID (Auth0 user_id)
+        :param data: 包含更新信息的字典
+        :return: 更新后的用户对象
+        """
+        user = User.query.filter_by(user_id=user_id).first()
+        if not user:
+            raise ValueError("用户未找到")
+
+        if "email" in data:
+            user.email = data["email"]
+        if "full_name" in data:
+            user.full_name = data["full_name"]
+        if "gender" in data:
+            user.gender = data["gender"]
+        if "mbti" in data:
+            user.mbti = data["mbti"]
+        if "star_sign" in data:
+            user.star_sign = data["star_sign"]
+        if "skills" in data:
+            user.skills = data["skills"]
+        if "interests" in data:
+            user.interests = data["interests"]
+        if "year_of_study" in data:
+            user.year_of_study = data["year_of_study"]
+        if "major" in data:
+            user.major = data["major"]
+        if "picture" in data:
+            user.picture = data["picture"]
+        if "best_working_experience" in data:
+            user.best_working_experience = data["best_working_experience"]
+
+        if "key_factors" in data:
+            user.set_key_factors(data["key_factors"])
+        if "lightning_answers" in data:
+            user.set_lightning_answers(data["lightning_answers"])
+        if "fun_facts" in data:
+            user.set_fun_facts(data["fun_facts"])
+        if "tags" in data:
+            user.set_tags(data["tags"])
+
+        db.session.commit()
+        return user
 
     @staticmethod
     def get_user_by_email(email):
