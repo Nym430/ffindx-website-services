@@ -4,10 +4,9 @@ from api.services.project_service import (
     ProjectApplicationService,
     ProjectDeliverableService,
     DeliverableConfirmationService,
+    ProjectService,
 )
-from api.models.project import Project, ProjectApplication
 from api.models.project_contribution import ProjectContribution
-from datetime import datetime
 
 project_bp = Blueprint("project", __name__, url_prefix="/api")
 
@@ -108,7 +107,7 @@ def create_project():
     user_id = data.get("user_id")
 
     try:
-        project = app.services.project_service.ProjectService.create_project(
+        project = ProjectService.create_project(
             data, user_id
         )
         return jsonify({"message": "项目创建成功", "data": project.to_dict()}), 200
@@ -153,7 +152,7 @@ def get_project_list():
         filters["keyword"] = request.args.get("keyword")
 
     try:
-        projects = app.services.project_service.ProjectService.get_project_list(filters)
+        projects = ProjectService.get_project_list(filters)
         return jsonify({"data": projects, "total": len(projects)}), 200
     except Exception as e:
         return jsonify({"error": f"获取项目列表失败: {str(e)}"}), 500
@@ -203,7 +202,7 @@ def get_founder_projects():
         filters["keyword"] = request.args.get("keyword")
 
     try:
-        projects = app.services.project_service.ProjectService.get_founder_project_list(
+        projects = ProjectService.get_founder_project_list(
             filters
         )
         return jsonify({"data": projects, "total": len(projects)}), 200
@@ -256,7 +255,7 @@ def get_participant_projects():
 
     try:
         projects = (
-            app.services.project_service.ProjectService.get_participant_project_list(
+            ProjectService.get_participant_project_list(
                 filters
             )
         )
@@ -274,7 +273,7 @@ def get_project_detail(project_id):
     - project_id: 项目ID
     """
     try:
-        project = app.services.project_service.ProjectService.get_project_detail(
+        project = ProjectService.get_project_detail(
             project_id
         )
         return jsonify({"data": project}), 200
@@ -306,7 +305,7 @@ def like_project(project_id):
     )
 
     try:
-        liked = app.services.project_service.ProjectService.add_or_remove_project_like(
+        liked = ProjectService.add_or_remove_project_like(
             project_id, user_id
         )
         if liked:
@@ -324,7 +323,7 @@ def get_project_leaderboard():
     """
     try:
         top_projects = (
-            app.services.project_service.ProjectService.get_top_liked_projects()
+            ProjectService.get_top_liked_projects()
         )
         return jsonify({"data": top_projects, "total": len(top_projects)}), 200
     except Exception as e:
@@ -496,7 +495,7 @@ def update_project(project_id):
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
 
     try:
-        project = app.services.project_service.ProjectService.update_project(
+        project = ProjectService.update_project(
             project_id, data, user_id
         )
         return jsonify({"message": "项目更新成功", "data": project.to_dict()}), 200
@@ -524,7 +523,7 @@ def delete_project():
         return jsonify({"error": "缺少必需的参数"}), 400
 
     try:
-        result = app.services.project_service.ProjectService.delete_project(
+        result = ProjectService.delete_project(
             project_id, user_id
         )
         return jsonify({"message": result["message"]}), 200
@@ -808,7 +807,7 @@ def get_my_all_projects():
         # 获取我创建的项目
         founder_filters = {"user_id": user_id}
         founder_projects = (
-            app.services.project_service.ProjectService.get_founder_project_list(
+            ProjectService.get_founder_project_list(
                 founder_filters
             )
         )
@@ -816,7 +815,7 @@ def get_my_all_projects():
         # 获取我参与的项目
         participant_filters = {"user_id": user_id}
         participant_projects = (
-            app.services.project_service.ProjectService.get_participant_project_list(
+            ProjectService.get_participant_project_list(
                 participant_filters
             )
         )
