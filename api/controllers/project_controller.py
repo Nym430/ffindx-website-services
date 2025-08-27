@@ -328,7 +328,7 @@ def apply_for_project():
     }
     """
     data = request.get_json()
-    user_id = request.get("user_id")  # 从查询参数获取 user_id
+    user_id = request.args.get("user_id")  # 从查询参数获取 user_id
 
     # 参数验证
     required_fields = ["project_id", "skill_type_id"]
