@@ -221,6 +221,42 @@ def process_application(application_id):
         return jsonify({'error': f'处理申请失败: {str(e)}'}), 500
 
 
+@project_bp.route('/project-applications/<int:application_id>', methods=['DELETE'])
+def delete_application(application_id):
+    """
+    删除项目申请API
+    """
+    user_id = request.args.get('user_id') # Or get from auth token
+    if not user_id:
+        return jsonify({'error': '缺少用户ID'}), 400
+
+    try:
+        ProjectApplicationService.delete_application(application_id, user_id)
+        return jsonify({'message': '申请删除成功'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': f'删除申请失败: {str(e)}'}), 500
+
+@project_bp.route('/project-applications/<int:application_id>', methods=['PATCH'])
+def update_application(application_id):
+    """
+    更新项目申请API
+    """
+    data = request.get_json()
+    user_id = data.get('user_id') # Or get from auth token
+    if not user_id:
+        return jsonify({'error': '缺少用户ID'}), 400
+
+    try:
+        application = ProjectApplicationService.update_application(application_id, user_id, data)
+        return jsonify({'message': '申请更新成功', 'data': application.to_dict()}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': f'更新申请失败: {str(e)}'}), 500
+
+
 @project_bp.route('/my-applications', methods=['GET'])
 def get_my_applications():
     """

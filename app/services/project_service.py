@@ -241,4 +241,40 @@ class ProjectApplicationService:
             ProjectApplication.created_at.desc()
         ).all()
         
-        return [application.to_dict() for application in applications] 
+        return [application.to_dict() for application in applications]
+
+    @staticmethod
+    def delete_application(application_id, user_id):
+        """
+        删除项目申请
+        :param application_id: 申请ID
+        :param user_id: 用户ID
+        """
+        application = ProjectApplication.query.get_or_404(application_id)
+        
+        if application.user_id != user_id:
+            raise ValueError("您无权删除此申请")
+            
+        db.session.delete(application)
+        db.session.commit()
+
+    @staticmethod
+    def update_application(application_id, user_id, data):
+        """
+        更新项目申请
+        :param application_id: 申请ID
+        :param user_id: 用户ID
+        :param data: 更新的数据
+        """
+        application = ProjectApplication.query.get_or_404(application_id)
+        
+        if application.user_id != user_id:
+            raise ValueError("您无权编辑此申请")
+            
+        if 'message' in data:
+            application.message = data['message']
+        if 'skill_type_id' in data:
+            application.skill_type_id = data['skill_type_id']
+            
+        db.session.commit()
+        return application 
