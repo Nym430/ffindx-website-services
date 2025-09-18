@@ -612,6 +612,49 @@ class ProjectApplicationService:
 
         return {"success": True, "message": "项目已成功移除"}
 
+    @staticmethod
+    def update_application(application_id, data, user_id):
+        """
+        更新项目申请
+        :param application_id: 申请ID
+        :param data: 包含更新信息的字典
+        :param user_id: 操作者ID (必须是申请者本人)
+        :return: 更新后的申请对象
+        """
+        application = ProjectApplication.query.get_or_404(application_id)
+
+        if application.user_id != user_id:
+            raise ValueError("您无权修改此申请")
+
+        if application.status != ProjectApplication.STATUS_PENDING:
+            raise ValueError("申请已被处理，无法修改")
+
+        if "message" in data:
+            application.message = data["message"]
+        if "skill_type_id" in data:
+            application.skill_type_id = data["skill_type_id"]
+
+        db.session.commit()
+        return application
+
+    @staticmethod
+    def delete_application(application_id, user_id):
+        """
+        删除项目申请
+        :param application_id: 申请ID
+        :param user_id: 操作者ID (必须是申请者本人)
+        :return: 操作结果
+        """
+        application = ProjectApplication.query.get_or_404(application_id)
+
+        if application.user_id != user_id:
+            raise ValueError("您无权删除此申请")
+
+        db.session.delete(application)
+        db.session.commit()
+
+        return {"success": True, "message": "申请已成功删除"}
+
 
 class ProjectDeliverableService:
     @staticmethod
