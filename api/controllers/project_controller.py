@@ -348,7 +348,7 @@ def apply_for_project():
         return jsonify({"error": f"提交申请失败: {str(e)}"}), 500
 
 
-@project_bp.route("/project-applications/<int:application_id>", methods=["PUT"])
+@project_bp.route("/project-applications/<int:application_id>/process", methods=["PUT"])
 def process_application(application_id):
     """
     处理项目申请API
@@ -381,6 +381,60 @@ def process_application(application_id):
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": f"处理申请失败: {str(e)}"}), 500
+
+
+@project_bp.route("/project-applications/<int:application_id>", methods=["PUT"])
+def update_application(application_id):
+    """
+    更新项目申请API (申请者本人)
+    路径参数:
+    - application_id: 申请ID
+    请求体:
+    {
+        "message": "新的申请消息",
+        "skill_type_id": 新的技能类型ID
+    }
+    请求参数 (URL查询参数):
+    - user_id: 申请者ID (必需)
+    """
+    data = request.get_json()
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "缺少必需的 user_id 参数"}), 400
+
+    try:
+        application = ProjectApplicationService.update_application(
+            application_id, user_id, data
+        )
+        return jsonify({"message": "申请更新成功", "data": application.to_dict()}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"更新申请失败: {str(e)}"}), 500
+
+
+@project_bp.route("/project-applications/<int:application_id>", methods=["DELETE"])
+def delete_application(application_id):
+    """
+    删除项目申请API (申请者本人)
+    路径参数:
+    - application_id: 申请ID
+    请求参数 (URL查询参数):
+    - user_id: 申请者ID (必需)
+    """
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "缺少必需的 user_id 参数"}), 400
+
+    try:
+        result = ProjectApplicationService.delete_application(application_id, user_id)
+        return jsonify(result), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"删除申请失败: {str(e)}"}), 500
 
 
 @project_bp.route("/my-applications", methods=["GET"])
