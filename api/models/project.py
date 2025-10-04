@@ -74,13 +74,7 @@ class Project(db.Model):
         """转换为字典"""
         creator_info = None
         if self.creator:
-            creator_info = {
-                "user_id": self.creator.user_id,
-                "picture": self.creator.picture,
-                "full_name": self.creator.full_name,
-                "major": self.creator.major,
-                "year_of_study": self.creator.year_of_study,
-            }
+            creator_info = self.creator.to_dict()
 
         # 获取最近5个参与者信息
         recent_participants = []
@@ -220,11 +214,7 @@ class ProjectApplication(db.Model):
         if self.project:
 
             if self.project.creator:
-                creator_info = {
-                    "user_id": self.project.creator.user_id,
-                    "full_name": self.project.creator.full_name,
-                    "picture": self.project.creator.picture,
-                }
+                creator_info = self.project.creator.to_dict()
 
             project_info = {
                 "id": self.project.id,
