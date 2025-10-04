@@ -8,7 +8,9 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.String(100), primary_key=True, comment="Auth0用户标识"
+    )
     email = db.Column(db.String(100), nullable=False, unique=True, comment="邮箱")
     full_name = db.Column(db.String(100), nullable=True, comment="全名")
     gender = db.Column(db.String(20), nullable=True, comment="性别")
@@ -26,9 +28,6 @@ class User(db.Model):
     best_working_experience = db.Column(db.Text, nullable=True, comment="最佳工作经历")
     tags = db.Column(db.Text, nullable=True, comment="标签，存储为JSON")
     picture = db.Column(db.String(500), nullable=True, comment="用户头像URL")
-    user_id = db.Column(
-        db.String(100), nullable=False, unique=True, comment="Auth0用户标识"
-    )
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -102,7 +101,7 @@ class User(db.Model):
     def to_dict(self):
         """转换为字典"""
         return {
-            "id": self.id,
+            "user_id": self.user_id,
             "email": self.email,
             "full_name": self.full_name,
             "gender": self.gender,
@@ -118,7 +117,6 @@ class User(db.Model):
             "best_working_experience": self.best_working_experience,
             "tags": self.get_tags(),
             "picture": self.picture,
-            "user_id": self.user_id,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         }
