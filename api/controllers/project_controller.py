@@ -72,7 +72,7 @@ def create_project():
     }
     """
     data = request.get_json()
-    print(f"create_project data: {data}")
+
     # 参数验证
     required_fields = ["name", "project_type", "user_id"]
     for field in required_fields:
@@ -328,9 +328,7 @@ def apply_for_project():
     }
     """
     data = request.get_json()
-    print(f"apply_for_project data: {data}")
-    user_id = request.args.get("user_id")  # 从查询参数获取 user_id
-    print(f"apply_for_project user_id: {user_id}")
+
 
     # 参数验证
     required_fields = ["project_id", "skill_type_id"]
@@ -400,9 +398,7 @@ def update_application(application_id):
     - user_id: 申请者ID (必需)
     """
     data = request.get_json()
-    print(f"update_application data: {data}")
-    user_id = request.args.get("user_id")
-    print(f"update_application user_id: {user_id}")
+
 
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
@@ -428,7 +424,7 @@ def delete_application(application_id):
     - user_id: 申请者ID (必需)
     """
     user_id = request.args.get("user_id")
-    print(f"delete_application user_id: {user_id}")
+
 
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
@@ -534,9 +530,7 @@ def update_project(project_id):
     - user_id: 操作者ID (必需，必须是项目创建者)
     """
     data = request.get_json()
-    print(f"update_project data: {data}")
-    user_id = request.args.get("user_id")
-    print(f"update_project user_id: {user_id}")
+
 
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
