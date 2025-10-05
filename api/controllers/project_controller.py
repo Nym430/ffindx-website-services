@@ -398,7 +398,7 @@ def update_application(application_id):
     - user_id: 申请者ID (必需)
     """
     data = request.get_json()
-
+    user_id = request.args.get("user_id")
 
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
