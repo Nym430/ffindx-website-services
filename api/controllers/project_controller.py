@@ -406,7 +406,7 @@ def update_application(application_id):
 
     try:
         application = ProjectApplicationService.update_application(
-            application_id, user_id, data
+            application_id, data, user_id
         )
         return jsonify({"message": "申请更新成功", "data": application.to_dict()}), 200
     except ValueError as e:
