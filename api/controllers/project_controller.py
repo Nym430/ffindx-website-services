@@ -329,6 +329,7 @@ def apply_for_project():
     """
     data = request.get_json()
 
+    user_id = request.args.get("user_id")
 
     # 参数验证
     required_fields = ["project_id", "skill_type_id"]
@@ -424,7 +425,6 @@ def delete_application(application_id):
     - user_id: 申请者ID (必需)
     """
     user_id = request.args.get("user_id")
-
 
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
@@ -531,7 +531,7 @@ def update_project(project_id):
     """
     data = request.get_json()
 
-
+    user_id = request.args.get("user_id")
     if not user_id:
         return jsonify({"error": "缺少必需的 user_id 参数"}), 400
 
